@@ -1,4 +1,4 @@
-Tesseract.js Offline
+Tesseract.js Offline 
 ====================
 
 This repository is a show case for how to use tesseract.js without downloading any files from remote.
@@ -36,3 +36,6 @@ You will see the result in terminal
 ## Where can I download \*.traineddata.gz for other languages?
 
 You can download from [naptha/tessdata](https://github.com/naptha/tessdata/tree/gh-pages/4.0.0)
+
+# The above portion is kept as it is.
+## However this project is just serving as the backbone for my project.

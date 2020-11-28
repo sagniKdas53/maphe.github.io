@@ -1,0 +1,1 @@
+Trying to extend the existing functionality of maphe's damage claculator by making a way to directly upload screeshots to get damage done of course you will need to set the other things but once done it will amke comairing builds much faster and esier. If it can even be done.

@@ -1,0 +1,6 @@
+node_modules
+tests/browser.7z
+lang-data/
+images/shots
+images/temp
+*.traineddata

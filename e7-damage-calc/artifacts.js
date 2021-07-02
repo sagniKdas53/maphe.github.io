@@ -8,6 +8,13 @@ const artifactDmgType = {
 };
 
 const artifacts = {
+  air_to_surface_missile_misha: {
+    id: 'air_to_surface_missile_misha',
+    name: 'Air-to-Surface Missile: MISHA',
+    scale: [0.15, 0.17, 0.18, 0.2, 0.21, 0.23, 0.24, 0.26, 0.27, 0.29, 0.3],
+    type: artifactDmgType.critDmgBoost,
+    exclusive: classType.ranger,
+  },
   a_little_queens_crown: {
     id: 'a_little_queens_crown',
     name: 'A Little Queen\'s Crown',
@@ -15,6 +22,36 @@ const artifacts = {
     type: artifactDmgType.damage,
     exclusive: classType.warrior,
     applies: (skill) => skill.single === true
+  },
+  a_symbol_of_unity: {
+    id: 'a_symbol_of_unity',
+    name: 'A Symbol of Unity',
+    scale: [0.08, 0.088, 0.096, 0.104, 0.112, 0.12, 0.128, 0.136, 0.144, 0.152, 0.16],
+    type: artifactDmgType.damage
+  },
+  ambrote: {
+    id: 'ambrote',
+    name: 'Ambrote',
+    type: artifactDmgType.damage,
+    scale: [0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2],
+    exclusive: classType.ranger,
+    applies: (_, skillId) => skillId === 's1',
+  },
+  ancient_sheath: {
+    id: 'ancient_sheath',
+    name: 'Ancient Sheath',
+    type: artifactDmgType.damage,
+    scale: [0.08, 0.088, 0.096, 0.104, 0.112, 0.12, 0.128, 0.136, 0.144, 0.152, 0.16],
+    applies: (_, skillId) => skillId === 's1',
+  },
+  black_hand_of_the_goddess: {
+    id: 'black_hand_of_the_goddess',
+    name: 'Black Hand of the Goddess',
+    scale: [0.12, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2, 0.21, 0.22, 0.24],
+    type: artifactDmgType.critDmgBoost,
+    exclusive: classType.mage,
+    form: [elements.attack_skill_stack_5],
+    value: (artiScale) => artiScale - ((artiScale / 10) * elements.attack_skill_stack_5.value()),
   },
   border_coin: {
     id: 'border_coin',
@@ -39,6 +76,15 @@ const artifacts = {
     value: 0.15,
     type: artifactDmgType.damage,
     exclusive: classType.mage,
+  },
+  double_edged_decrescent: {
+    id: 'double_edged_decrescent',
+    name: 'Double-Edged Decrescent',
+    type: artifactDmgType.attack,
+    scale: [0.05, 0.055, 0.06, 0.065, 0.07, 0.075, 0.08, 0.085, 0.09, 0.095, 0.1],
+    form: [elements.single_attack_stack_3],
+    exclusive: classType.thief,
+    value: (artiScale) => elements.single_attack_stack_3.value()*artiScale
   },
   draco_plate: {
     id: 'draco_plate',
@@ -109,7 +155,7 @@ const artifacts = {
   last_teatime: {
     id: 'last_teatime',
     name: 'Last Teatime',
-    scale: [0.07, 0.077, 0.084, 0.91, 0.98, 0.105, 0.112, 0.119, 0.126, 0.133, 0.14],
+    scale: [0.07, 0.077, 0.084, 0.091, 0.098, 0.105, 0.112, 0.119, 0.126, 0.133, 0.14],
     type: artifactDmgType.damage,
     exclusive: classType.mage,
     applies: (skill) => skill.aoe === true
@@ -167,6 +213,15 @@ const artifacts = {
     exclusive: classType.warrior,
     value: () => 0.25
   },
+  spear_of_a_new_dawn: {
+    id: 'spear_of_a_new_dawn',
+    name: 'Spear of a New Dawn',
+    type: artifactDmgType.aftermath,
+    atkPercent: 0.4,
+    penetrate: 0.7,
+    exclusive: classType.knight,
+    applies: (_, skillId) => skillId === 's1',
+  },
   sword_of_summer_twilight: {
     id: 'sword_of_summer_twilight',
     name: 'Sword of Summer Twilight',
@@ -204,6 +259,7 @@ const artifacts = {
     atkPercent: 0.45,
     penetrate: 0.7,
     exclusive: classType.warrior,
+    applies: (skill) => skill.single === true,
   },
   victorious_flag: {
     id: 'victorious_flag',
@@ -233,5 +289,12 @@ const artifacts = {
     type: artifactDmgType.attack,
     scale: [0.3, 0.33, 0.36, 0.39, 0.42, 0.45, 0.48, 0.51, 0.54, 0.57, 0.6],
     exclusive: classType.thief
+  },
+  wings_of_light_and_shadow: {
+    id: 'wings_of_light_and_shadow',
+    name: 'Wings of Light and Shadow',
+    scale: [0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2],
+    type: artifactDmgType.damage,
+    exclusive: classType.knight,
   },
 };

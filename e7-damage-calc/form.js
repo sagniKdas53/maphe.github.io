@@ -21,6 +21,43 @@ const elements = {
     readonly: true,
     value: () => Number(document.getElementById('nb-hits').value)
   },
+  target_attack: {
+    ref: 'target_attack',
+    id: 'target-attack',
+    label: 'Target Attack',
+    type: 'slider',
+    min: 200,
+    max: 10000,
+    default: 2000,
+    value: () => Number(document.getElementById('target-attack').value)
+        * Number(elements.target_atk_up.value() ? 1.5 : 1)
+        * Number(elements.target_atk_up_great.value() ? 1.75 : 1)
+        * Number(elements.target_atk_down.value() ? 0.5 : 1),
+  },
+  target_atk_up: {
+    ref: 'target_atk_up',
+    id: 'target-atk-up',
+    label: 'Target has Increased Attack',
+    type: 'checkbox',
+    value: () => document.getElementById('target-atk-up').checked,
+    icon: 'https://epic7x.com/wp-content/uploads/2018/12/stic_att_up.png'
+  },
+  target_atk_up_great: {
+    ref: 'target_atk_up_great',
+    id: 'target-atk-up-great',
+    label: 'Target has Increased Attack (Great)',
+    type: 'checkbox',
+    value: () => document.getElementById('target-atk-up-great').checked,
+    icon: 'https://epic7x.com/wp-content/uploads/2019/01/greater-attack-icon.png'
+  },
+  target_atk_down: {
+    ref: 'target_atk_down',
+    id: 'target-atk-down',
+    label: 'Target has Decreased Attack',
+    type: 'checkbox',
+    value: () => document.getElementById('target-atk-down').checked,
+    icon: 'https://epic7x.com/wp-content/uploads/2018/12/stic_att_dn.png'
+  },
   target_max_hp: {
     ref: 'target_max_hp',
     id: 'target-max-hp',
@@ -33,6 +70,13 @@ const elements = {
       return defPreset.value ? defPreset.options[defPreset.selectedIndex].dataset.hp : 10000
     },
     value: () => Number(document.getElementById('target-max-hp').value)
+  },
+  target_is_highest_max_hp: {
+    ref: 'target_is_highest_max_hp',
+    id: 'target-is-highest-max-hp',
+    label: 'Target is Highest max HP',
+    type: 'checkbox',
+    value: () => document.getElementById('target-is-highest-max-hp').checked
   },
   target_hp_pc: {
     ref: 'target_hp_pc',
@@ -83,7 +127,7 @@ const elements = {
     label: 'Debuffs on Targets',
     type: 'slider',
     min: 0,
-    max: 9,
+    max: 10,
     default: 0,
     readonly: true,
     value: () => Number(document.getElementById('target-nb-debuff').value)
@@ -117,6 +161,14 @@ const elements = {
     type: 'checkbox',
     value: () => document.getElementById('target-has-sleep').checked,
     icon: 'https://epic7x.com/wp-content/uploads/2018/12/stic_sleep.png'
+  },
+  target_has_provoke: {
+    ref: 'target_has_provoke',
+    id: 'target-has-provoke',
+    label: 'Target is Provoked',
+    type: 'checkbox',
+    value: () => document.getElementById('target-has-provoke').checked,
+    icon: 'https://epic7x.com/wp-content/uploads/2018/12/stic_provoke.png'
   },
   target_has_target: {
     ref: 'target_has_target',
@@ -269,6 +321,13 @@ const elements = {
     readonly: true,
     value: () => Number(document.getElementById('caster-nb-buff').value)
   },
+  caster_has_debuff: {
+    ref: 'caster_has_debuff',
+    id: 'caster-has-debuff',
+    label: 'Caster has debuffs',
+    type: 'checkbox',
+    value: () => document.getElementById('caster-has-debuff').checked
+  },
   caster_full_focus: {
     ref: 'caster_full_focus',
     id: 'caster-full-focus',
@@ -392,6 +451,28 @@ const elements = {
     readonly: true,
     value: () => Number(document.getElementById('stack-non-attack-skill-10').value)
   },
+  single_attack_stack_3: {
+    ref: 'single_attack_stack_3',
+    id: 'single-stack-skill-3',
+    label: 'Single Attack Stack',
+    type: 'slider',
+    min: 0,
+    max: 3,
+    default: 0,
+    readonly: true,
+    value: () => Number(document.getElementById('single-stack-skill-3').value)
+  },
+  dual_attack_stack_5: {
+    ref: 'dual_attack_stack_5',
+    id: 'dual-stack-skill-5',
+    label: 'Dual Attack Stack',
+    type: 'slider',
+    min: 0,
+    max: 5,
+    default: 0,
+    readonly: true,
+    value: () => Number(document.getElementById('dual-stack-skill-5').value)
+  },
   attack_skill_stack_3: {
     ref: 'attack_skill_stack_3',
     id: 'stack-attack-skill-3',
@@ -469,6 +550,17 @@ const elements = {
     readonly: true,
     value: () => Number(document.getElementById('caster-attacked-stack-3').value)
   },
+  caster_attacked_stack_5: {
+    ref: 'caster_attacked_stack_5',
+    id: 'caster-attacked-stack-5',
+    label: 'Caster Attacked Stack',
+    type: 'slider',
+    min: 0,
+    max: 5,
+    default: 0,
+    readonly: true,
+    value: () => Number(document.getElementById('caster-attacked-stack-5').value)
+  },
   dead_people: {
     ref: 'dead_people',
     id: 'dead-people',
@@ -489,6 +581,8 @@ const elements = {
     max: 10000,
     default: 4000,
     value: () => Number(document.getElementById('highest-ally-attack').value)
+        * (elements.ally_atk_up.value() ? 1.5 : 1)
+        * (elements.ally_atk_up_great.value() ? 1.75 : 1),
   },
   ally_atk_up: {
     ref: 'ally_atk_up',
@@ -558,6 +652,7 @@ const elements = {
 elements.caster_speed.sub_elements = [elements.caster_speed_up];
 elements.caster_defense.sub_elements = [elements.caster_defense_up];
 elements.highest_ally_attack.sub_elements = [elements.ally_atk_up, elements.ally_atk_up_great];
+elements.target_attack.sub_elements = [elements.target_atk_up, elements.target_atk_up_great, elements.target_atk_down];
 
 const slide = (fieldId) => {
   document.getElementById(fieldId).value = document.getElementById(`${fieldId}-slide`).value;
@@ -742,10 +837,6 @@ const refreshArtifactList = (hero) => {
 };
 
 const buildElement = (elem, parent) => {
-  if (document.getElementById(elem.id) !== null) {
-    return;
-  }
-
   if (elem.type === 'slider') {
     $(parent).append(`<div id="${elem.id}-block" class="stat-block">
                         <div class="form-group row col-sm-12">
@@ -809,6 +900,15 @@ const classIcon = (type) => {
   }
 };
 
+const dedupeForm = (hero, artifact) => {
+  const heroElIds = (hero.form || []).map(element => element.id);
+  const artiElIds = (artifact.form || []).map(element => element.id);
+  const intersect = heroElIds.filter(id => artiElIds.includes(id));
+  if (intersect.length > 0) {
+    artifact.form = artifact.form.filter(element => !intersect.includes(element.id));
+  }
+}
+
 $(() => {
   try {
     const heroSelector = document.getElementById('hero');
@@ -816,6 +916,8 @@ $(() => {
     Object.keys(heroes).map((id => {
       $(heroSelector).append(`<option value="${id}" data-tokens="${heroNicknames(id)}" data-content="${elemIcon(heroes[id].element)}${classIcon(heroes[id].classType)}<span>${heroName(id)}</span>">${heroName(id)}</option>`)
     }));
+    $(heroSelector).selectpicker('refresh');
+
     $(artiSelector).append(`<option value="">${artifactName('no_proc')}</option>`);
     $(artiSelector).append(`<option data-divider="true"></option>`);
     Object.keys(artifacts).map((id => {
@@ -824,9 +926,11 @@ $(() => {
 
     heroSelector.onchange = () => {
       const hero = heroes[heroSelector.value];
+      const artifact = { ...artifacts[artiSelector.value] };
+      dedupeForm(hero, artifact);
       build(hero);
       refreshArtifactList(hero);
-      buildArtifact(artifacts[artiSelector.value]);
+      buildArtifact(artifact);
       resolve();
       gtag('event', 'pick', {
         event_category: 'Hero',

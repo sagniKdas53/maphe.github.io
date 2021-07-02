@@ -87,7 +87,7 @@ const getModTooltip = (hero, skillId, soulburn = false) => {
     content += `${skillLabel('flat')}: <span class="float-right">${values.flatTip} <b>${Math.round(values.flat)}</b></span><br/>`;
   }
   if (values.critBoost !== null) content += `${skillLabel('critBoost')}: <b class="float-right">+${Math.round(values.critBoost*100)}%</b><br/>`;
-  if (values.pen != null) content += `${skillLabel('pen')}: <b class="float-right">${Math.round(values.pen*100)}%</b><br/>`;
+  if (values.pen != null) content += `${skillLabel('pen')}: <span class="float-right">${values.penTip} <b>${Math.round(values.pen*100)}%</b></span><br/>`;
   if (values.detonation != null) content += `${skillLabel('detonation')}: <b class="float-right">+${Math.round(values.detonation*100)}%</b><br/>`;
   if (values.exEq != null) content += `${skillLabel('exEq')}: <b class="float-right">+${Math.round(values.exEq*100)}%</b><br/>`;
   if (values.elemAdv !== null) content += `${skillLabel('elemAdv')}: <i class="fas ${values.elemAdv ? 'fa-check-square' : 'fa-times-circle'} float-right"></i><br/>`;
@@ -145,6 +145,8 @@ const getGlobalDefMult = () => {
   return mult;
 };
 
+let currentHero = null;
+
 class Hero {
   constructor(id, artifact) {
     this.id = id;
@@ -159,6 +161,7 @@ class Hero {
     this.barrierEnhance = heroes[id].barrierEnhance;
     this.artifact = artifact;
     this.target = new Target(artifact);
+    currentHero = this;
   }
 
   getModifiers(skillId, soulburn = false) {
@@ -172,12 +175,13 @@ class Hero {
       flatTip: skill.flatTip !== undefined ? getSkillModTip(skill.flatTip(soulburn)) : '',
       critBoost: skill.critDmgBoost ? skill.critDmgBoost(soulburn) : null,
       pen: skill.penetrate ? skill.penetrate() : null,
+      penTip: skill.penetrateTip !== undefined ? getSkillModTip(skill.penetrateTip(soulburn)) : '',
       detonation: skill.detonation !== undefined ? skill.detonation()-1 : null,
       exEq: skill.exEq !== undefined ? skill.exEq() : null,
       elemAdv: (typeof skill.elemAdv === 'function') ? skill.elemAdv() : null,
       afterMathFormula: skill.afterMath !== undefined ? skill.afterMath(soulburn) : null,
       afterMathDmg: skill.afterMath !== undefined ? this.getAfterMathSkillDamage(skillId, hitTypes.crit) : null,
-      extraDmg: skill.extraDmg !== undefined ? skill.extraDmg(soulburn) : null,
+      extraDmg: skill.extraDmg !== undefined ? skill.extraDmg() : null,
       extraDmgTip: skill.extraDmgTip !== undefined ? getSkillModTip(skill.extraDmgTip(soulburn)) : ''
     }
   }
@@ -189,12 +193,11 @@ class Hero {
     const skill = this.skills[skillId];
     const hit = this.offensivePower(skillId, soulburn) * this.target.defensivePower(skill);
     const critDmg = Math.min((this.crit / 100)+critDmgBuff, 3.5)+(skill.critDmgBoost ? skill.critDmgBoost(soulburn) : 0)+(this.artifact.getCritDmgBoost()||0);
-    const extraDmg = skill.extraDmg !== undefined ? Math.round(skill.extraDmg(soulburn)) : 0;
     return {
-      crit: skill.noCrit ? null : Math.round(hit*critDmg + this.getAfterMathDamage(skillId, hitTypes.crit)) + extraDmg,
-      crush: skill.noCrit || skill.onlyCrit ? null : Math.round(hit*1.3 + this.getAfterMathDamage(skillId, hitTypes.crush)) + extraDmg,
-      normal: skill.onlyCrit ? null : Math.round(hit + this.getAfterMathDamage(skillId, hitTypes.normal)) + extraDmg,
-      miss: skill.noMiss ? null : Math.round(hit*0.75 + this.getAfterMathDamage(skillId, hitTypes.miss)) + extraDmg
+      crit: skill.noCrit ? null : Math.round(hit*critDmg + this.getAfterMathDamage(skillId, hitTypes.crit)),
+      crush: skill.noCrit || skill.onlyCrit ? null : Math.round(hit*1.3 + this.getAfterMathDamage(skillId, hitTypes.crush)),
+      normal: skill.onlyCrit ? null : Math.round(hit + this.getAfterMathDamage(skillId, hitTypes.normal)),
+      miss: skill.noMiss ? null : Math.round(hit*0.75 + this.getAfterMathDamage(skillId, hitTypes.miss))
     };
   }
 
@@ -228,7 +231,7 @@ class Hero {
     }
     const target = document.getElementById('target').checked ? Number(document.getElementById('target').value) : 1.0;
 
-    let dmgMod = 1.0 + getGlobalDamageMult(this) + this.artifact.getDamageMultiplier(skill) + (skill.mult ? skill.mult(soulburn)-1 : 0);
+    let dmgMod = 1.0 + getGlobalDamageMult(this) + this.artifact.getDamageMultiplier(skill, skillId) + (skill.mult ? skill.mult(soulburn)-1 : 0);
 
     return ((this.getAtk(skillId)*rate + flatMod)*dmgConst + flatMod2) * pow * skillEnhance * elemAdv * target * dmgMod;
   }
@@ -263,12 +266,13 @@ class Hero {
     const skill = this.skills[skillId];
     const detonation = this.getDetonateDamage(skillId);
 
-    let artiDamage = this.getAfterMathArtifactDamage(skill);
+    let artiDamage = this.getAfterMathArtifactDamage(skillId);
     if (artiDamage === null) artiDamage = 0;
 
     const skillDamage = this.getAfterMathSkillDamage(skillId, hitType);
+    const skillExtraDmg = skill.extraDmg !== undefined ? Math.round(skill.extraDmg(hitType)) : 0;
 
-    return detonation + artiDamage + skillDamage;
+    return detonation + artiDamage + skillDamage + skillExtraDmg;
   }
 
   getAfterMathSkillDamage(skillId, hitType) {
@@ -283,8 +287,10 @@ class Hero {
     return skillDamage;
   }
 
-  getAfterMathArtifactDamage(skill) {
-    const artiMultipliers = this.artifact.getAfterMathMultipliers(skill);
+  getAfterMathArtifactDamage(skillId) {
+    const skill = this.skills[skillId];
+
+    const artiMultipliers = this.artifact.getAfterMathMultipliers(skill, skillId);
     if (artiMultipliers !== null) {
       return this.getAtk()*artiMultipliers.atkPercent*dmgConst*this.target.defensivePower({ penetrate: () => artiMultipliers.penetrate }, true);
     }
@@ -349,9 +355,9 @@ class Artifact {
     this.id = id ? id : undefined;
   }
 
-  applies(skill) {
+  applies(skill, skillId = undefined) {
     if (this.id === undefined || skill === undefined) return true;
-    return artifacts[this.id].applies !== undefined ? artifacts[this.id].applies(skill) : true;
+    return artifacts[this.id].applies !== undefined ? artifacts[this.id].applies(skill, skillId) : true;
   }
 
   getName() {
@@ -362,8 +368,8 @@ class Artifact {
     return artifacts[this.id].scale ? artifacts[this.id].scale[Math.floor(document.getElementById('artifact-lvl').value/3)] : artifacts[this.id].value;
   }
 
-  getDamageMultiplier(skill) {
-    if(!this.applies(skill)) return 0;
+  getDamageMultiplier(skill, skillId) {
+    if(!this.applies(skill, skillId)) return 0;
     if (this.id === undefined || artifacts[this.id].type !== artifactDmgType.damage) {
       return 0;
     }
@@ -378,8 +384,8 @@ class Artifact {
     return this.getValue();
   }
 
-  getAfterMathMultipliers(skill) {
-    if(!this.applies(skill)) return null;
+  getAfterMathMultipliers(skill, skillId) {
+    if(!this.applies(skill, skillId)) return null;
     if (this.id === undefined || artifacts[this.id].type !== artifactDmgType.aftermath || artifacts[this.id].atkPercent === undefined || artifacts[this.id].penetrate === undefined) {
       return null;
     }
@@ -400,7 +406,7 @@ class Artifact {
     if (this.id === undefined || artifacts[this.id].type !== artifactDmgType.critDmgBoost) {
       return 0;
     }
-    return this.getValue();
+    return artifacts[this.id].value ? artifacts[this.id].value(this.getValue()) : this.getValue();
   }
 
   getFlatMult() {
